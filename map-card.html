@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子科技大学成都学院 - 校园地图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .map-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            max-width: 850px;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .map-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .school-logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: bold;
+            color: #1a365d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .school-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .school-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .school-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        #map-container {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        #map-container:hover iframe {
+            transform: scale(1.02);
+        }
+
+        .map-info {
+            padding: 30px 35px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .map-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4299e1, #3182ce, #2c5282);
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .info-section:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .info-section:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .info-section:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+
+        .info-content {
+            color: #4a5568;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .landmark-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .landmark-tag {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 14px;
+            color: #4a5568;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landmark-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(66, 153, 225, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .landmark-tag:hover::before {
+            left: 100%;
+        }
+
+        .landmark-tag:hover {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border-color: #4299e1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+        }
+
+        .card-footer {
+            padding: 25px 35px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 28px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(44, 82, 130, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(44, 82, 130, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3182ce;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .map-card {
+                margin: 20px;
+            }
+            
+            .card-header {
+                padding: 30px 20px;
+            }
+            
+            .school-name {
+                font-size: 24px;
+            }
+            
+            #map-container {
+                height: 350px;
+            }
+            
+            .map-info {
+                padding: 25px 20px;
+            }
+            
+            .card-footer {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-card">
+        <div class="card-header">
+            <div class="school-logo">UESTC</div>
+            <div class="school-name">电子科技大学成都学院</div>
+            <div class="school-subtitle">Chengdu College of University of Electronic Science and Technology of China</div>
+        </div>
+        
+        <div class="card-body">
+            <div id="map-container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>地图加载中...</div>
+                </div>
+            </div>
+            
+            <div class="map-info">
+                <div class="info-section">
+                    <div class="info-title">
+                        <span class="info-icon">📍</span>
+                        学校地址
+                    </div>
+                    <div class="info-content">
+                        四川省成都市高新西区百叶路1号
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-title">
+                        <span class="info-icon">🏢</span>
+                        校园地标
+                    </div>
+                    <div class="landmark-list">
+                        <span class="landmark-tag">图书馆</span>
+                        <span class="landmark-tag">教学楼</span>
+                        <span class="landmark-tag">实验楼</span>
+                        <span class="landmark-tag">体育馆</span>
+                        <span class="landmark-tag">学生宿舍</span>
+                        <span class="landmark-tag">食堂</span>
+                        <span class="landmark-tag">操场</span>
+                        <span class="landmark-tag">行政楼</span>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-title">
+                        <span class="info-icon">🚇</span>
+                        交通信息
+                    </div>
+                    <div class="info-content">
+                        地铁：可乘坐地铁2号线至百草路站，步行约15分钟到达<br>
+                        公交：乘坐96路、116路、231路等公交车至百叶路站
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+            <a href="https://www.cduestc.cn" target="_blank" class="btn btn-secondary">
+                <span>🏠</span> 学校官网
+            </a>
+            <button class="btn btn-primary" onclick="openNavigation()">
+                <span>🧭</span> 导航前往
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 学校坐标（电子科技大学成都学院）
+        const schoolLocation = {
+            lng: 103.9705,
+            lat: 30.7415,
+            name: '电子科技大学成都学院'
+        };
+
+        // 初始化地图
+        function initMap() {
+            const container = document.getElementById('map-container');
+            container.innerHTML = '';
+            
+            // 创建 iframe 嵌入高德地图
+            const mapIframe = document.createElement('iframe');
+            mapIframe.width = '100%';
+            mapIframe.height = '100%';
+            mapIframe.style.border = 'none';
+            mapIframe.src = `https://uri.amap.com/marker?position=${schoolLocation.lng},${schoolLocation.lat}&name=${encodeURIComponent(schoolLocation.name)}&src=&coordinate=gaode&callnative=0`;
+            
+            container.appendChild(mapIframe);
+        }
+
+        // 打开导航
+        function openNavigation() {
+            const url = `https://uri.amap.com/navigation?to=${schoolLocation.lng},${schoolLocation.lat},${encodeURIComponent(schoolLocation.name)}&mode=car&policy=1`;
+            window.open(url, '_blank');
+        }
+
+        // 页面加载完成后初始化地图
+        window.onload = function() {
+            setTimeout(initMap, 800);
+        };
+
+        // 添加滚动效果
+        window.addEventListener('scroll', function() {
+            const card = document.querySelector('.map-card');
+            if (card) {
+                const scrollY = window.scrollY;
+                card.style.transform = `translateY(${Math.min(scrollY * 0.1, 20)}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
