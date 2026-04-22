@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI口语陪练与纠音系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域 */
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .app-title {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 16px;
+            color: #4a5568;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* 导航栏 */
+        .nav {
+            background: white;
+            border-radius: 16px;
+            padding: 0 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 15px 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #f7fafc;
+        }
+
+        /* 主要内容区域 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* 左侧主内容 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* 练习卡片 */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        /* 口语练习区域 */
+        .practice-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .practice-topic {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .topic-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .topic-content {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .voice-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 2px dashed #e2e8f0;
+        }
+
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .mic-button.recording {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
+        }
+
+        .voice-status {
+            font-size: 16px;
+            color: #4a5568;
+            text-align: center;
+        }
+
+        /* 纠音结果 */
+        .correction-result {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            background: #edf2f7;
+        }
+
+        .result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .result-icon.correct {
+            background: rgba(72, 187, 120, 0.2);
+            color: #38a169;
+        }
+
+        .result-icon.error {
+            background: rgba(229, 62, 62, 0.2);
+            color: #e53e3e;
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-word {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .result-suggestion {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* 右侧侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* 学习报告 */
+        .report-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .report-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        /* 历史记录 */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: #718096;
+            min-width: 80px;
+        }
+
+        .history-content {
+            flex: 1;
+            font-size: 14px;
+            color: #4a5568;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 推荐练习 */
+        .recommendation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recommendation-item {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recommendation-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-difficulty {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .app-name {
+                font-size: 28px;
+            }
+
+            .nav-list {
+                justify-content: center;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .voice-input {
+                padding: 20px;
+            }
+
+            .mic-button {
+                width: 100px;
+                height: 100px;
+                font-size: 32px;
+            }
+        }
+
+        /* 滚动动画 */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">🎯</div>
+                    <div class="app-title">
+                        <h1 class="app-name">AI口语陪练与纠音系统</h1>
+                        <p class="app-subtitle">让口语练习更智能，发音纠正更精准</p>
+                    </div>
+                </div>
+                <div class="user-section">
+                    <span>周杨杰</span>
+                    <div class="user-avatar">周</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航栏 -->
+        <nav class="nav">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#" class="nav-link active">口语练习</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">发音纠正</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">学习报告</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">练习历史</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">设置</a></li>
+            </ul>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="content-grid">
+            <!-- 左侧主内容 -->
+            <div class="main-content">
+                <!-- 口语练习卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">今日练习</h2>
+                        <span style="color: #667eea; font-size: 14px;">Level 2 · 日常生活</span>
+                    </div>
+                    <div class="practice-area">
+                        <div class="practice-topic">
+                            <h3 class="topic-title">话题：自我介绍</h3>
+                            <p class="topic-content">请用英语介绍一下你自己，包括你的名字、年龄、兴趣爱好和未来规划。尝试使用丰富的词汇和流畅的表达。</p>
+                        </div>
+                        
+                        <div class="voice-input">
+                            <button class="mic-button" id="micButton">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <p class="voice-status" id="voiceStatus">点击开始录音</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 纠音结果卡片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">发音纠正</h2>
+                        <span style="color: #48bb78; font-size: 14px;">AI 分析完成</span>
+                    </div>
+                    <div class="correction-result">
+                        <div class="result-item">
+                            <div class="result-icon correct">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="result-content">
+                                <div class="result-word">Hello</div>
+                                <div class="result-suggestion">发音准确，继续保持</div>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-icon error">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <div class="result-content">
+                                <div class="result-word">pronunciation</div>
+                                <div class="result-suggestion">注意 "ci" 的发音，舌头位置靠前</div>
+                            </div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-icon correct">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="result-content">
+                                <div class="result-word">interesting</div>
+                                <div class="result-suggestion">发音准确，语调自然</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧侧边栏 -->
+            <div class="sidebar">
+                <!-- 学习报告 -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3 class="card-title">学习报告</h3>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-item">
+                            <span class="progress-label">发音准确度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%;"></div>
+                            </div>
+                            <span class="progress-value">85%</span>
+                        </div>
+                        <div class="progress-item">
+                            <span class="progress-label">流畅度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%;"></div>
+                            </div>
+                            <span class="progress-value">78%</span>
+                        </div>
+                        <div class="progress-item">
+                            <span class="progress-label">词汇丰富度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 72%;"></div>
+                            </div>
+                            <span class="progress-value">72%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 练习历史 -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-icon"><i class="fas fa-history"></i></div>
+                        <h3 class="card-title">练习历史</h3>
+                    </div>
+                    <div class="history-list">
+                        <div class="history-item">
+                            <span class="history-time">今天 10:30</span>
+                            <span class="history-content">自我介绍练习</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-time">昨天 16:45</span>
+                            <span class="history-content">购物对话练习</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-time">昨天 09:15</span>
+                            <span class="history-content">旅游话题练习</span>
+                        </div>
+                        <div class="history-item">
+                            <span class="history-time">3月20日</span>
+                            <span class="history-content">职场面试练习</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推荐练习 -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-icon"><i class="fas fa-lightbulb"></i></div>
+                        <h3 class="card-title">推荐练习</h3>
+                    </div>
+                    <div class="recommendation-list">
+                        <div class="recommendation-item">
+                            <div class="recommendation-title">商务英语对话</div>
+                            <div class="recommendation-difficulty">难度：中级</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <div class="recommendation-title">旅游英语常用句</div>
+                            <div class="recommendation-difficulty">难度：初级</div>
+                        </div>
+                        <div class="recommendation-item">
+                            <div class="recommendation-title">学术演讲技巧</div>
+                            <div class="recommendation-difficulty">难度：高级</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>© 2026 · AI口语陪练与纠音系统</p>
+            <p style="margin-top: 8px; font-size: 13px;">让每一次练习都有进步</p>
+        </div>
+    </div>
+
+    <script>
+        // 录音功能模拟
+        const micButton = document.getElementById('micButton');
+        const voiceStatus = document.getElementById('voiceStatus');
+        let isRecording = false;
+
+        micButton.addEventListener('click', function() {
+            if (!isRecording) {
+                // 开始录音
+                isRecording = true;
+                micButton.classList.add('recording');
+                micButton.innerHTML = '<i class="fas fa-stop"></i>';
+                voiceStatus.textContent = '正在录音...';
+                
+                // 模拟录音过程
+                setTimeout(function() {
+                    isRecording = false;
+                    micButton.classList.remove('recording');
+                    micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                    voiceStatus.textContent = '录音完成，正在分析...';
+                    
+                    // 模拟分析完成
+                    setTimeout(function() {
+                        voiceStatus.textContent = '分析完成，查看结果';
+                    }, 1500);
+                }, 5000);
+            } else {
+                // 停止录音
+                isRecording = false;
+                micButton.classList.remove('recording');
+                micButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                voiceStatus.textContent = '录音已停止';
+            }
+        });
+
+        // 导航栏切换
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - AI口语陪练与纠音系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px; /* 为底部Tab栏留出空间 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 头部用户信息 */
+        .user-header {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .user-level {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .user-days {
+            font-size: 14px;
+            color: #4a5568;
+            margin-top: 10px;
+        }
+
+        /* 核心数据区 */
+        .core-stats {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        /* 功能入口区 */
+        .feature-entries {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .entry-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .entry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .entry-item {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .entry-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .entry-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .entry-info {
+            flex: 1;
+        }
+
+        .entry-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .entry-desc {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .entry-arrow {
+            color: #a0aec0;
+            font-size: 16px;
+        }
+
+        /* 会员权益区 */
+        .membership-section {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .membership-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .membership-info {
+            flex: 1;
+        }
+
+        .membership-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .membership-benefits {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .benefit-item {
+            font-size: 12px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .membership-status {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .upgrade-btn {
+            padding: 12px 24px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 底部入口区 */
+        .bottom-entries {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .bottom-entry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .bottom-entry-item {
+            text-align: center;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bottom-entry-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .bottom-entry-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .bottom-entry-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 70px;
+            }
+
+            .user-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 36px;
+            }
+
+            .user-name {
+                font-size: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .core-stats,
+            .feature-entries,
+            .membership-section,
+            .bottom-entries {
+                padding: 20px;
+            }
+
+            .entry-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .membership-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .membership-benefits {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .bottom-entry-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .bottom-entry-item {
+                padding: 15px 10px;
+            }
+
+            .bottom-entry-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            .bottom-entry-title {
+                font-size: 12px;
+            }
+
+            .tab-icon {
+                font-size: 18px;
+            }
+
+            .tab-label {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部用户信息 -->
+        <div class="user-header">
+            <div class="user-avatar">周</div>
+            <div class="user-info">
+                <h1 class="user-name">周杨杰</h1>
+                <div>
+                    <span class="user-level">口语能力：中级</span>
+                    <span class="user-days">累计学习 45 天</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心数据区 -->
+        <div class="core-stats">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">120</div>
+                    <div class="stat-label">练习时长(分钟)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">320</div>
+                    <div class="stat-label">开口次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">850</div>
+                    <div class="stat-label">单词量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">65%</div>
+                    <div class="stat-label">能力提升</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能入口区 -->
+        <div class="feature-entries">
+            <div class="entry-section">
+                <h2 class="section-title">
+                    <i class="fas fa-tools"></i>
+                    功能入口
+                </h2>
+                <div class="entry-grid">
+                    <div class="entry-item" onclick="window.location.href='error-practice.html'">
+                        <div class="entry-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="entry-info">
+                            <h3 class="entry-title">我的错题本</h3>
+                            <p class="entry-desc">查看和复习发音错误的单词</p>
+                        </div>
+                        <div class="entry-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="entry-item" onclick="window.location.href='practice-history.html'">
+                        <div class="entry-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="entry-info">
+                            <h3 class="entry-title">我的练习记录</h3>
+                            <p class="entry-desc">查看历史练习数据和报告</p>
+                        </div>
+                        <div class="entry-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="entry-item" onclick="window.location.href='learning-path.html'">
+                        <div class="entry-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="entry-info">
+                            <h3 class="entry-title">学习计划</h3>
+                            <p class="entry-desc">个性化学习路径和目标</p>
+                        </div>
+                        <div class="entry-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="entry-item" onclick="window.location.href='settings.html'">
+                        <div class="entry-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="entry-info">
+                            <h3 class="entry-title">系统设置</h3>
+                            <p class="entry-desc">账号和系统相关设置</p>
+                        </div>
+                        <div class="entry-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 会员权益区 -->
+        <div class="membership-section">
+            <h2 class="section-title">
+                <i class="fas fa-crown"></i>
+                会员权益
+            </h2>
+            <div class="membership-card">
+                <div class="membership-info">
+                    <h3 class="membership-title">普通会员</h3>
+                    <div class="membership-benefits">
+                        <span class="benefit-item">基础功能</span>
+                        <span class="benefit-item">每日练习</span>
+                        <span class="benefit-item">学习报告</span>
+                    </div>
+                    <div class="membership-status">有效期至：2024-12-31</div>
+                </div>
+                <button class="upgrade-btn" onclick="window.location.href='membership.html'">立即升级</button>
+            </div>
+        </div>
+
+        <!-- 底部入口区 -->
+        <div class="bottom-entries">
+            <div class="bottom-entry-grid">
+                <div class="bottom-entry-item" onclick="window.location.href='orders.html'">
+                    <div class="bottom-entry-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="bottom-entry-title">我的订单</h3>
+                </div>
+                <div class="bottom-entry-item" onclick="window.location.href='customer-service.html'">
+                    <div class="bottom-entry-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3 class="bottom-entry-title">客服中心</h3>
+                </div>
+                <div class="bottom-entry-item" onclick="window.location.href='terms.html'">
+                    <div class="bottom-entry-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3 class="bottom-entry-title">用户协议</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">首页</span>
+            </a>
+            <a href="practice-library.html" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">练习</span>
+            </a>
+            <a href="learning-report.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span class="nav-label">学习</span>
+            </a>
+            <a href="personal-center.html" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 底部Tab栏切换
+        const tabItems = document.querySelectorAll('.tab-item');
+        tabItems.forEach((item, index) => {
+            item.addEventListener('click', function() {
+                // 移除所有激活状态
+                tabItems.forEach(tab => tab.classList.remove('active'));
+                // 添加当前激活状态
+                this.classList.add('active');
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.user-header, .core-stats, .feature-entries, .membership-section, .bottom-entries').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>

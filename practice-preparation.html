@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陪练准备 - AI口语陪练与纠音系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px; /* 为底部Tab栏留出空间 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域 */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #edf2f7;
+            transform: translateX(-5px);
+        }
+
+        .scenario-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            flex: 1;
+        }
+
+        /* 场景信息卡片区 */
+        .info-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .info-meta {
+            flex: 1;
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .info-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .stat-item i {
+            color: #667eea;
+        }
+
+        .info-content {
+            margin-top: 20px;
+        }
+
+        .content-section {
+            margin-bottom: 20px;
+        }
+
+        .content-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .content-title i {
+            color: #667eea;
+        }
+
+        .content-text {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .core-vocabulary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .vocab-item {
+            padding: 8px 16px;
+            background: #f7fafc;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 发音设置区 */
+        .settings-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-title i {
+            color: #667eea;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .voice-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .voice-option {
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            min-width: 100px;
+        }
+
+        .voice-option:hover {
+            border-color: #667eea;
+        }
+
+        .voice-option.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .voice-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .voice-gender {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .voice-play {
+            margin-top: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-play:hover {
+            background: #edf2f7;
+        }
+
+        .speed-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .speed-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .speed-option:hover {
+            border-color: #667eea;
+        }
+
+        .speed-option.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .speed-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .dialogue-mode {
+            display: flex;
+            gap: 20px;
+        }
+
+        .mode-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mode-option:hover {
+            border-color: #667eea;
+        }
+
+        .mode-option.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .mode-radio {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .mode-info {
+            flex: 1;
+        }
+
+        .mode-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* 开始练习按钮 */
+        .start-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            padding: 20px 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .start-btn:hover {
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .scenario-name {
+                font-size: 18px;
+            }
+
+            .info-section {
+                padding: 20px;
+            }
+
+            .scenario-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .info-title {
+                font-size: 16px;
+            }
+
+            .info-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .settings-section {
+                padding: 20px;
+            }
+
+            .voice-options {
+                justify-content: space-between;
+            }
+
+            .voice-option {
+                flex: 1;
+                min-width: 80px;
+                padding: 10px;
+            }
+
+            .dialogue-mode {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .start-btn {
+                padding: 16px 40px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <div class="header">
+            <div class="back-btn" onclick="window.location.href='scenario-selection.html'">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h1 class="scenario-name" id="scenarioName">购物对话</h1>
+        </div>
+
+        <!-- 场景信息卡片区 -->
+        <div class="info-section">
+            <div class="info-header">
+                <div class="scenario-icon" id="scenarioIcon">🛍️</div>
+                <div class="info-meta">
+                    <h2 class="info-title" id="infoTitle">购物对话练习</h2>
+                    <div class="info-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span id="difficulty">中级</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="duration">15分钟</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span id="audience">所有级别</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-content">
+                <div class="content-section">
+                    <h3 class="content-title">
+                        <i class="fas fa-info-circle"></i>
+                        场景介绍
+                    </h3>
+                    <p class="content-text" id="scenarioDesc">本场景模拟在商场、超市等购物环境中的对话，练习如何询问商品、讨价还价、结账等实用购物用语。</p>
+                </div>
+                <div class="content-section">
+                    <h3 class="content-title">
+                        <i class="fas fa-bullseye"></i>
+                        练习目标
+                    </h3>
+                    <p class="content-text" id="practiceGoal">掌握购物相关的基本词汇和表达，能够在实际购物场景中进行简单的英语对话，提高口语表达能力。</p>
+                </div>
+                <div class="content-section">
+                    <h3 class="content-title">
+                        <i class="fas fa-book"></i>
+                        核心词汇
+                    </h3>
+                    <div class="core-vocabulary" id="coreVocabulary">
+                        <span class="vocab-item">price</span>
+                        <span class="vocab-item">discount</span>
+                        <span class="vocab-item">size</span>
+                        <span class="vocab-item">color</span>
+                        <span class="vocab-item">try on</span>
+                        <span class="vocab-item">checkout</span>
+                        <span class="vocab-item">receipt</span>
+                        <span class="vocab-item">refund</span>
+                    </div>
+                </div>
+                <div class="content-section">
+                    <h3 class="content-title">
+                        <i class="fas fa-exclamation-circle"></i>
+                        难度说明
+                    </h3>
+                    <p class="content-text" id="difficultyDesc">本场景为中级难度，包含一些常用的购物用语和表达，适合有一定基础的学习者。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 发音设置区 -->
+        <div class="settings-section">
+            <h2 class="settings-title">
+                <i class="fas fa-cog"></i>
+                发音设置
+            </h2>
+            
+            <div class="setting-group">
+                <label class="setting-label">AI陪练音色</label>
+                <div class="voice-options">
+                    <div class="voice-option active">
+                        <div class="voice-name">David</div>
+                        <div class="voice-gender">男</div>
+                        <div class="voice-play" onclick="playVoice('David')">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="voice-option">
+                        <div class="voice-name">Emma</div>
+                        <div class="voice-gender">女</div>
+                        <div class="voice-play" onclick="playVoice('Emma')">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="voice-option">
+                        <div class="voice-name">Michael</div>
+                        <div class="voice-gender">男</div>
+                        <div class="voice-play" onclick="playVoice('Michael')">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="voice-option">
+                        <div class="voice-name">Sophia</div>
+                        <div class="voice-gender">女</div>
+                        <div class="voice-play" onclick="playVoice('Sophia')">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">语速设置</label>
+                <div class="speed-options">
+                    <div class="speed-option">
+                        <div class="speed-label">慢</div>
+                    </div>
+                    <div class="speed-option active">
+                        <div class="speed-label">中</div>
+                    </div>
+                    <div class="speed-option">
+                        <div class="speed-label">快</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">对话模式</label>
+                <div class="dialogue-mode">
+                    <div class="mode-option active">
+                        <input type="radio" class="mode-radio" name="dialogue-mode" checked>
+                        <div class="mode-info">
+                            <div class="mode-title">自由对话</div>
+                            <div class="mode-desc">根据场景自由交流，模拟真实对话</div>
+                        </div>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" class="mode-radio" name="dialogue-mode">
+                        <div class="mode-info">
+                            <div class="mode-title">引导式对话</div>
+                            <div class="mode-desc">按照提示进行对话，适合初学者</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 开始练习按钮 -->
+        <div class="start-section">
+            <button class="start-btn" onclick="window.location.href='real-time-conversation.html'">开始练习</button>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-label">首页</span>
+        </a>
+        <a href="practice-library.html" class="nav-item active">
+            <i class="fas fa-book nav-icon"></i>
+            <span class="nav-label">练习</span>
+        </a>
+        <a href="learning-report.html" class="nav-item">
+            <i class="fas fa-chart-line nav-icon"></i>
+            <span class="nav-label">学习</span>
+        </a>
+        <a href="personal-center.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-label">我的</span>
+        </a>
+    </div>
+
+    <script>
+        // 场景数据
+        const scenarioData = {
+            shopping: {
+                name: '购物对话',
+                icon: '🛍️',
+                title: '购物对话练习',
+                difficulty: '中级',
+                duration: '15分钟',
+                audience: '所有级别',
+                description: '本场景模拟在商场、超市等购物环境中的对话，练习如何询问商品、讨价还价、结账等实用购物用语。',
+                goal: '掌握购物相关的基本词汇和表达，能够在实际购物场景中进行简单的英语对话，提高口语表达能力。',
+                vocabulary: ['price', 'discount', 'size', 'color', 'try on', 'checkout', 'receipt', 'refund'],
+                difficultyDesc: '本场景为中级难度，包含一些常用的购物用语和表达，适合有一定基础的学习者。'
+            },
+            airport: {
+                name: '机场办理',
+                icon: '✈️',
+                title: '机场办理练习',
+                difficulty: '中级',
+                duration: '20分钟',
+                audience: '中级以上',
+                description: '本场景模拟在机场办理值机、安检、登机等流程中的对话，练习相关的英语表达。',
+                goal: '掌握机场相关的基本词汇和表达，能够在机场环境中进行简单的英语对话，为出国旅行做准备。',
+                vocabulary: ['check-in', 'boarding pass', 'security', 'gate', 'boarding', 'luggage', 'passport', 'customs'],
+                difficultyDesc: '本场景为中级难度，包含一些机场专用词汇和表达，适合有一定基础的学习者。'
+            },
+            restaurant: {
+                name: '餐厅点餐',
+                icon: '🍽️',
+                title: '餐厅点餐练习',
+                difficulty: '初级',
+                duration: '10分钟',
+                audience: '初级',
+                description: '本场景模拟在餐厅点餐、询问菜品、结账等场景中的对话，练习相关的英语表达。',
+                goal: '掌握餐厅相关的基本词汇和表达，能够在餐厅环境中进行简单的英语对话，提高口语表达能力。',
+                vocabulary: ['menu', 'order', 'bill', 'tip', 'reservation', 'appetizer', 'main course', 'dessert'],
+                difficultyDesc: '本场景为初级难度，包含一些基本的餐厅用语和表达，适合初学者。'
+            },
+            interview: {
+                name: '职场面试',
+                icon: '💼',
+                title: '职场面试练习',
+                difficulty: '高级',
+                duration: '25分钟',
+                audience: '高级',
+                description: '本场景模拟职场面试中的常见问题和回答，练习相关的英语表达和应对技巧。',
+                goal: '掌握面试相关的词汇和表达，能够在面试中流利地回答问题，提升职场英语竞争力。',
+                vocabulary: ['resume', 'experience', 'strength', 'weakness', 'salary', 'benefits', 'responsibility', 'teamwork'],
+                difficultyDesc: '本场景为高级难度，包含一些专业的职场词汇和表达，适合有较高英语水平的学习者。'
+            },
+            hospital: {
+                name: '医院就诊',
+                icon: '🏥',
+                title: '医院就诊练习',
+                difficulty: '中级',
+                duration: '15分钟',
+                audience: '中级以上',
+                description: '本场景模拟在医院预约、描述症状、与医生交流等场景中的对话，练习相关的英语表达。',
+                goal: '掌握医院相关的基本词汇和表达，能够在医院环境中进行简单的英语对话，描述自己的症状。',
+                vocabulary: ['appointment', 'symptom', 'pain', 'prescription', 'medicine', 'doctor', 'nurse', 'treatment'],
+                difficultyDesc: '本场景为中级难度，包含一些医院专用词汇和表达，适合有一定基础的学习者。'
+            },
+            campus: {
+                name: '校园生活',
+                icon: '🏫',
+                title: '校园生活练习',
+                difficulty: '初级',
+                duration: '12分钟',
+                audience: '初级',
+                description: '本场景模拟校园日常交流、课堂互动、社团活动等场景中的对话，练习相关的英语表达。',
+                goal: '掌握校园相关的基本词汇和表达，能够在校园环境中进行简单的英语对话，提高口语表达能力。',
+                vocabulary: ['class', 'teacher', 'student', 'homework', 'exam', 'library', 'campus', 'club'],
+                difficultyDesc: '本场景为初级难度，包含一些基本的校园用语和表达，适合初学者。'
+            }
+        };
+
+        // 获取URL参数
+        function getURLParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 加载场景数据
+        function loadScenarioData() {
+            const scenario = getURLParam('scenario') || 'shopping';
+            const data = scenarioData[scenario] || scenarioData.shopping;
+
+            // 更新页面内容
+            document.getElementById('scenarioName').textContent = data.name;
+            document.getElementById('scenarioIcon').textContent = data.icon;
+            document.getElementById('infoTitle').textContent = data.title;
+            document.getElementById('difficulty').textContent = data.difficulty;
+            document.getElementById('duration').textContent = data.duration;
+            document.getElementById('audience').textContent = data.audience;
+            document.getElementById('scenarioDesc').textContent = data.description;
+            document.getElementById('practiceGoal').textContent = data.goal;
+            document.getElementById('difficultyDesc').textContent = data.difficultyDesc;
+
+            // 更新核心词汇
+            const vocabContainer = document.getElementById('coreVocabulary');
+            vocabContainer.innerHTML = '';
+            data.vocabulary.forEach(word => {
+                const vocabItem = document.createElement('span');
+                vocabItem.className = 'vocab-item';
+                vocabItem.textContent = word;
+                vocabContainer.appendChild(vocabItem);
+            });
+        }
+
+        // 页面加载时执行
+        window.onload = loadScenarioData;
+
+        // 音色选择
+        const voiceOptions = document.querySelectorAll('.voice-option');
+        voiceOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                voiceOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 语速选择
+        const speedOptions = document.querySelectorAll('.speed-option');
+        speedOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                speedOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 对话模式选择
+        const modeOptions = document.querySelectorAll('.mode-option');
+        const modeRadios = document.querySelectorAll('.mode-radio');
+        modeOptions.forEach((option, index) => {
+            option.addEventListener('click', function() {
+                modeOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                modeRadios[index].checked = true;
+            });
+        });
+
+        // 播放语音
+        function playVoice(name) {
+            console.log('播放语音:', name);
+            // 这里可以添加实际的语音播放逻辑
+            alert(`播放${name}的语音示例`);
+        }
+
+        // 开始练习
+        const startBtn = document.querySelector('.start-btn');
+        startBtn.addEventListener('click', function() {
+            console.log('开始练习');
+            // 这里可以添加实际的开始练习逻辑
+        });
+    </script>
+</body>
+</html>

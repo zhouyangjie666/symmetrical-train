@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习计划 - AI口语陪练与纠音系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px; /* 为底部Tab栏留出空间 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域 */
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #edf2f7;
+            transform: translateX(-5px);
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            flex: 1;
+            text-align: center;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #edf2f7;
+        }
+
+        /* 学习目标 */
+        .goal-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .goal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .edit-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .goal-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .goal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .goal-info {
+            flex: 1;
+        }
+
+        .goal-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .goal-progress {
+            background: #f7fafc;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            width: 35%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        /* 学习路径 */
+        .path-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .path-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .path-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .path-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .path-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 40px;
+            bottom: -10px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .path-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            z-index: 1;
+        }
+
+        .path-icon.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .path-icon.completed {
+            background: #c6f6d5;
+            color: #22543d;
+            border-color: #38a169;
+        }
+
+        .path-info {
+            flex: 1;
+        }
+
+        .path-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .path-desc {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .path-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .path-duration {
+            font-size: 12px;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .path-status {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .path-status.active {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .path-status.completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .start-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 每日任务 */
+        .task-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .task-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .task-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-checkbox.checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 5px;
+        }
+
+        .task-desc {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .task-reward {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 70px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .page-title {
+                text-align: left;
+            }
+
+            .goal-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .goal-icon {
+                margin-bottom: 15px;
+            }
+
+            .path-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .path-icon {
+                align-self: flex-start;
+            }
+
+            .path-item:not(:last-child)::after {
+                left: 24px;
+                top: 40px;
+                bottom: -10px;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .task-content {
+                width: 100%;
+            }
+
+            .task-reward {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <div class="header">
+            <div class="back-btn" onclick="window.location.href='personal-center.html'">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h1 class="page-title">学习计划</h1>
+            <div class="action-btn">
+                <i class="fas fa-cog"></i>
+            </div>
+        </div>
+
+        <!-- 学习目标 -->
+        <div class="goal-section">
+            <div class="goal-header">
+                <h2 class="goal-title">我的学习目标</h2>
+                <button class="edit-btn">编辑目标</button>
+            </div>
+            <div class="goal-content">
+                <div class="goal-icon">🎯</div>
+                <div class="goal-info">
+                    <div class="goal-text">3个月内达到英语中级水平</div>
+                    <div class="goal-progress">
+                        <div class="progress-bar" style="width: 35%;"></div>
+                    </div>
+                    <div class="progress-text">已完成 35%，还需 65 天</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习路径 -->
+        <div class="path-section">
+            <div class="path-header">
+                <h2 class="path-title">学习路径</h2>
+            </div>
+
+            <div class="path-item">
+                <div class="path-icon completed">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="path-info">
+                    <div class="path-name">基础入门</div>
+                    <div class="path-desc">掌握基本问候语和日常用语</div>
+                    <div class="path-meta">
+                        <span class="path-duration"><i class="fas fa-clock"></i> 2周</span>
+                        <span class="path-status completed">已完成</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="path-item">
+                <div class="path-icon active">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="path-info">
+                    <div class="path-name">日常对话</div>
+                    <div class="path-desc">学习购物、餐厅、出行等场景对话</div>
+                    <div class="path-meta">
+                        <span class="path-duration"><i class="fas fa-clock"></i> 4周</span>
+                        <span class="path-status active">进行中</span>
+                    </div>
+                </div>
+                <button class="start-btn">开始练习</button>
+            </div>
+
+            <div class="path-item">
+                <div class="path-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="path-info">
+                    <div class="path-name">职场英语</div>
+                    <div class="path-desc">掌握职场沟通和面试技巧</div>
+                    <div class="path-meta">
+                        <span class="path-duration"><i class="fas fa-clock"></i> 4周</span>
+                        <span class="path-status">未开始</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="path-item">
+                <div class="path-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="path-info">
+                    <div class="path-name">高级表达</div>
+                    <div class="path-desc">学习复杂句式和地道表达</div>
+                    <div class="path-meta">
+                        <span class="path-duration"><i class="fas fa-clock"></i> 6周</span>
+                        <span class="path-status">未开始</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 每日任务 -->
+        <div class="task-section">
+            <div class="task-header">
+                <h2 class="task-title">今日任务</h2>
+            </div>
+
+            <div class="task-item">
+                <div class="task-content">
+                    <div class="task-checkbox checked">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-info">
+                        <div class="task-name">完成10分钟口语练习</div>
+                        <div class="task-desc">练习日常问候和自我介绍</div>
+                    </div>
+                </div>
+                <div class="task-reward">+10经验</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-content">
+                    <div class="task-checkbox checked">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="task-info">
+                        <div class="task-name">复习5个错题</div>
+                        <div class="task-desc">回顾昨日练习中的发音错误</div>
+                    </div>
+                </div>
+                <div class="task-reward">+5经验</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-content">
+                    <div class="task-checkbox"></div>
+                    <div class="task-info">
+                        <div class="task-name">学习新场景对话</div>
+                        <div class="task-desc">掌握餐厅点餐用语</div>
+                    </div>
+                </div>
+                <div class="task-reward">+15经验</div>
+            </div>
+
+            <div class="task-item">
+                <div class="task-content">
+                    <div class="task-checkbox"></div>
+                    <div class="task-info">
+                        <div class="task-name">完成发音纠音练习</div>
+                        <div class="task-desc">重点练习元音发音</div>
+                    </div>
+                </div>
+                <div class="task-reward">+10经验</div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">首页</span>
+            </a>
+            <a href="practice-library.html" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">练习</span>
+            </a>
+            <a href="learning-report.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span class="nav-label">学习</span>
+            </a>
+            <a href="personal-center.html" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 任务完成功能
+        const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+        taskCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                if (this.classList.contains('checked')) {
+                    this.classList.remove('checked');
+                    this.innerHTML = '';
+                } else {
+                    this.classList.add('checked');
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                }
+            });
+        });
+
+        // 开始练习按钮
+        const startBtns = document.querySelectorAll('.start-btn');
+        startBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 跳转到练习页面
+                window.location.href = 'practice-preparation.html';
+            });
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.goal-section, .path-section, .task-section, .path-item, .task-item').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>

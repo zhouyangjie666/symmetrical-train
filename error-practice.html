@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的错题本 - AI口语陪练与纠音系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px; /* 为底部Tab栏留出空间 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域 */
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #edf2f7;
+            transform: translateX(-5px);
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            flex: 1;
+            text-align: center;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #edf2f7;
+        }
+
+        /* 统计信息 */
+        .stats-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        /* 错题列表 */
+        .error-list {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .filter-select {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #4a5568;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .error-item {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .error-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .error-word {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .error-tag {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .error-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .error-info {
+            flex: 1;
+        }
+
+        .error-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .error-detail {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .error-audio {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audio-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transform: scale(1.1);
+        }
+
+        .audio-text {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .error-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .error-date {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .retry-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-btn:hover {
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 70px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .page-title {
+                text-align: left;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .error-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .error-item {
+                padding: 15px;
+            }
+
+            .error-word {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <div class="header">
+            <div class="back-btn" onclick="window.location.href='personal-center.html'">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h1 class="page-title">我的错题本</h1>
+            <div class="action-btn">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">总错题数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">待复习</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">78%</div>
+                    <div class="stat-label">掌握率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">今日复习</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错题列表 -->
+        <div class="error-list">
+            <div class="list-header">
+                <h2 class="list-title">错题列表</h2>
+                <select class="filter-select">
+                    <option value="all">全部</option>
+                    <option value="pronunciation">发音错误</option>
+                    <option value="grammar">语法错误</option>
+                    <option value="vocabulary">词汇错误</option>
+                </select>
+            </div>
+
+            <div class="error-item">
+                <div class="error-header">
+                    <h3 class="error-word">pronunciation</h3>
+                    <span class="error-tag">发音错误</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-info">
+                        <div class="error-label">错误类型：</div>
+                        <div class="error-detail">重音位置错误，正确重音在第四个音节</div>
+                        <div class="error-label">正确发音：</div>
+                        <div class="error-audio">
+                            <div class="audio-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span class="audio-text">/prəˌnʌnsiˈeɪʃn/</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="error-footer">
+                    <span class="error-date">2024-04-20</span>
+                    <button class="retry-btn">重新练习</button>
+                </div>
+            </div>
+
+            <div class="error-item">
+                <div class="error-header">
+                    <h3 class="error-word">restaurant</h3>
+                    <span class="error-tag">发音错误</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-info">
+                        <div class="error-label">错误类型：</div>
+                        <div class="error-detail">末尾的't'音未发音</div>
+                        <div class="error-label">正确发音：</div>
+                        <div class="error-audio">
+                            <div class="audio-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span class="audio-text">/ˈrestrɒnt/</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="error-footer">
+                    <span class="error-date">2024-04-19</span>
+                    <button class="retry-btn">重新练习</button>
+                </div>
+            </div>
+
+            <div class="error-item">
+                <div class="error-header">
+                    <h3 class="error-word">accommodation</h3>
+                    <span class="error-tag">发音错误</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-info">
+                        <div class="error-label">错误类型：</div>
+                        <div class="error-detail">中间的'mm'音发得不够清晰</div>
+                        <div class="error-label">正确发音：</div>
+                        <div class="error-audio">
+                            <div class="audio-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span class="audio-text">/əˌkɒməˈdeɪʃn/</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="error-footer">
+                    <span class="error-date">2024-04-18</span>
+                    <button class="retry-btn">重新练习</button>
+                </div>
+            </div>
+
+            <div class="error-item">
+                <div class="error-header">
+                    <h3 class="error-word">I have been studying English for 5 years</h3>
+                    <span class="error-tag">语法错误</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-info">
+                        <div class="error-label">错误类型：</div>
+                        <div class="error-detail">时态使用错误，应使用现在完成进行时</div>
+                        <div class="error-label">正确表达：</div>
+                        <div class="error-detail">I have been studying English for 5 years</div>
+                    </div>
+                </div>
+                <div class="error-footer">
+                    <span class="error-date">2024-04-17</span>
+                    <button class="retry-btn">重新练习</button>
+                </div>
+            </div>
+
+            <div class="error-item">
+                <div class="error-header">
+                    <h3 class="error-word">The weather is very hot today</h3>
+                    <span class="error-tag">词汇错误</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-info">
+                        <div class="error-label">错误类型：</div>
+                        <div class="error-detail">形容词使用不当，应使用very而不是too</div>
+                        <div class="error-label">正确表达：</div>
+                        <div class="error-detail">The weather is very hot today</div>
+                    </div>
+                </div>
+                <div class="error-footer">
+                    <span class="error-date">2024-04-16</span>
+                    <button class="retry-btn">重新练习</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-label">首页</span>
+            </a>
+            <a href="practice-library.html" class="nav-item">
+                <i class="fas fa-book nav-icon"></i>
+                <span class="nav-label">练习</span>
+            </a>
+            <a href="learning-report.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span class="nav-label">学习</span>
+            </a>
+            <a href="personal-center.html" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span class="nav-label">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 音频播放功能
+        const audioBtns = document.querySelectorAll('.audio-btn');
+        audioBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 这里可以添加实际的音频播放逻辑
+                console.log('播放音频');
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-play')) {
+                    icon.classList.remove('fa-play');
+                    icon.classList.add('fa-pause');
+                } else {
+                    icon.classList.remove('fa-pause');
+                    icon.classList.add('fa-play');
+                }
+            });
+        });
+
+        // 重新练习按钮
+        const retryBtns = document.querySelectorAll('.retry-btn');
+        retryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 跳转到练习页面
+                window.location.href = 'practice-preparation.html';
+            });
+        });
+
+        // 筛选功能
+        const filterSelect = document.querySelector('.filter-select');
+        filterSelect.addEventListener('change', function() {
+            console.log('筛选：', this.value);
+            // 这里可以添加实际的筛选逻辑
+        });
+
+        // 滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stats-section, .error-list, .error-item').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>
